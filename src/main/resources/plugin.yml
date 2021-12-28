@@ -4,3 +4,4 @@ version: 1.0
 description: Ядро сервера.
 api-version: 1.16
 author: sliva
+depend: [LuckPerms]

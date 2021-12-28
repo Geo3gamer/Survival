@@ -22,6 +22,8 @@ public class TabList implements Runnable {
     public void run() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             updatePlayerTab(player);
+            player.displayName(Utils.getDisplayName(player));
+            player.playerListName(Utils.getTabListName(player));
         }
     }
 
