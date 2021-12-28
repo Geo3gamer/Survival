@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -82,7 +83,10 @@ public class PlayerListener implements Listener {
         if (p.hasPermission("survival.color")) {
             message = ChatColor.translateAlternateColorCodes('&', message);
         }
-
+        message = message.replaceAll("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b", "");
+        message = message.trim();
+        message = StringUtils.normalizeSpace(message);
+        if (message.equals("")) return;
         String chatFormat = config.getColorizedString("messages.chatFormat");
         if(message.startsWith("!")) {
             message = message.substring(1);
@@ -108,7 +112,7 @@ public class PlayerListener implements Listener {
         } else if (l.getWorld() != ll.getWorld()) {
             return true;
         }
-        return l.distanceSquared(ll) > 100;
+        return l.distanceSquared(ll) > 1000;
     }
 
     @EventHandler
