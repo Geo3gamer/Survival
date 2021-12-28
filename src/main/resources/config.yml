@@ -1,0 +1,10 @@
+messages:
+  join: '<target> &aприсоединился к игре.'
+  quit: '<target> &cпокинул игру.'
+  motd: '&a&l | &aArt&a&lGame &aSurvival &b&k | &b&l&n1.9 - 1.18.1/n&a&l | &aКлассическое выживание'
+  listPlayers: '&e&l<min>&8/&e&l<max>'
+  chatFormat: '&7<player>§8 » &7<message>'
+  nobodyHeard: '&cВас никто не слышит.'
+  unknownCommand: '&fНеизвестная команда.'
+  tabHeader: '/n&9&lArt&c&lGame &6&lSurvival/n&fОнлайн: &a&l<online>/n&fПинг: &a&l<ping>/n'
+  # ----------------------------------------------
