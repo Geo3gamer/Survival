@@ -25,10 +25,7 @@ import ru.sliva.survival.config.PlayersConfig;
 import ru.sliva.survival.config.PluginConfig;
 import ru.sliva.survival.config.SPlayer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class PlayerListener implements Listener {
 
@@ -82,7 +79,6 @@ public class PlayerListener implements Listener {
     public void onChat(final @NotNull AsyncChatEvent e) {
         Player p = e.getPlayer();
         Component message = e.message();
-        Set<Audience> viewers = e.viewers();
         if(p.hasPermission("survival.color")) {
             message = ampersandSerializer.deserialize(ampersandSerializer.serialize(message));
         }
@@ -117,7 +113,8 @@ public class PlayerListener implements Listener {
                 rendered = rendered.replaceText(builder -> builder.matchLiteral("<message>").replacement(msg.color(NamedTextColor.GRAY)));
                 return localChat.append(rendered);
             }));
-            for(Audience audience : viewers) {
+            Set<Audience> viewers = e.viewers();
+            for(Audience audience : new HashSet<>(viewers)) {
                 if(audience instanceof Player) {
                     Player player = (Player) audience;
                     if(outOfRange(p.getLocation(), player.getLocation())) {
