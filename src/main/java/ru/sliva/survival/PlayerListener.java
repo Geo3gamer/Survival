@@ -34,12 +34,10 @@ public class PlayerListener implements Listener {
 
     private final PlayersConfig playersConfig;
     private final PluginConfig config;
-    private final Survival plugin;
     private final LegacyComponentSerializer ampersandSerializer = LegacyComponentSerializer.legacyAmpersand();
     private final LegacyComponentSerializer paragraphSerializer = LegacyComponentSerializer.legacySection();
 
     public PlayerListener(@NotNull Survival plugin) {
-        this.plugin = plugin;
         this.playersConfig = plugin.getPlayersConfig();
         this.config = plugin.getConfig();
         Bukkit.getPluginManager().registerEvents(this, plugin);

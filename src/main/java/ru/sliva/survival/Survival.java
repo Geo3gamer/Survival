@@ -22,7 +22,7 @@ public class Survival extends JavaPlugin {
 
 		new PlayerListener(this);
 		new TabList(this);
-		new Sidebar(this);
+		new Sidebar();
 	}
 
 	public static Survival getInstance() {

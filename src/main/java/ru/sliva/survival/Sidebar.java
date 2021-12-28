@@ -37,7 +37,7 @@ public class Sidebar implements Runnable {
     private int informationCounter = 0;
     private String[] currentInformation;
 
-    public Sidebar(Survival plugin) {
+    public Sidebar() {
         Schedule.timer(this, 20);
         Schedule.timerAsync(() -> {
             currentInformation = informationList.get(informationCounter);
