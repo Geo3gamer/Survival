@@ -6,6 +6,9 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import ru.sliva.survival.api.Commands;
+import ru.sliva.survival.command.SlezhkaCommand;
+import ru.sliva.survival.command.SudoCommand;
+import ru.sliva.survival.command.TellCommand;
 import ru.sliva.survival.config.PlayersConfig;
 import ru.sliva.survival.config.PluginConfig;
 
@@ -33,6 +36,10 @@ public class Survival extends JavaPlugin {
 		new PlayerListener(this);
 		new TabList(this);
 		new Sidebar();
+
+		Commands.registerCommand(new TellCommand(this));
+		Commands.registerCommand(new SlezhkaCommand(this));
+		Commands.registerCommand(new SudoCommand(this));
 	}
 
 	public static Survival getInstance() {

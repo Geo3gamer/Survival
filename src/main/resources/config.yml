@@ -3,8 +3,25 @@ messages:
   quit: '<target> &cпокинул игру.'
   motd: '&a&l | &aArt&a&lGame &aSurvival &b&k | &b&l&n1.9 - 1.18.1/n&a&l | &aКлассическое выживание'
   listPlayers: '&e&l<min>&8/&e&l<max>'
-  chatFormat: '<player>§8 » <message>'
+  chatFormat: '<player>&8 » <message>'
   nobodyHeard: '&cВас никто не слышит.'
   unknownCommand: '&fНеизвестная команда.'
   tabHeader: '/n&9&lArt&c&lGame &6&lSurvival/n&fОнлайн: &a&l<online>/n&fПинг: &a&l<ping>/n'
+  playerIsOffline: '<player> &7не в сети.'
+hoverEvents:
+  copyChatMessage: '&fСкопировать сообщение'
+  sendMessage: '&fОтправить <player> &fсообщение'
+  copyPrivateMessage: '&fСкопировать личное сообщение'
+  reply: '&fОтветить'
+commands:
+  tell:
+    fromSender: '&2[&r<s> &a-> &r<t>&2]&8 » <msg>'
+    onTarget: '&3[&r<t> &b<- &r<s>&3]&8 » <msg>'
+  slezhka:
+    enabled: '&aСлежка включена.'
+    disabled: '&cСлежка выключена.'
+    kick: '&c[Kick] (&r<player>&c) [<cause>] &8» &r<message>'
+    command: '&a[Command] (&r<player>&a) &8» &f<command>'
+  sudo:
+    executed: '&a[&r<player>&a]&8 » <command>'
   # ----------------------------------------------

@@ -6,14 +6,17 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import ru.sliva.survival.config.PluginConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Utils {
 
+    private static final PluginConfig config = Survival.getInstance().getConfig();
     private static final LuckPerms luckPerms = Survival.getInstance().luckPerms;
     private static final LegacyComponentSerializer ampersandSerializer = LegacyComponentSerializer.legacyAmpersand();
 
@@ -61,5 +64,27 @@ public final class Utils {
             formattedSuffix = ampersandSerializer.deserialize(suffix);
         }
         return formattedPrefix.append(Component.text(player.getName())).append(formattedSuffix);
+    }
+
+    public static @NotNull Component getDisplayName(@NotNull CommandSender sender) {
+        if(sender instanceof Player) {
+            return ((Player) sender).displayName();
+        }
+        return Component.text(sender.getName());
+    }
+
+    public static @NotNull Component constructPlayerIsOffline(@NotNull String name) {
+        Component playerIsOffline = ampersandSerializer.deserialize(config.getString("messages.playerIsOffline"));
+        playerIsOffline = playerIsOffline.replaceText(builder -> builder.matchLiteral("<player>").replacement(name));
+        return playerIsOffline;
+    }
+
+    public static @NotNull String stringFromArray(String @NotNull [] array, int start, @NotNull String split) {
+        StringBuilder builder = new StringBuilder();
+        for(int i = start; i < array.length; i++) {
+            builder.append(array[i]);
+            builder.append(i < array.length - 1 ? split : "");
+        }
+        return builder.toString();
     }
 }

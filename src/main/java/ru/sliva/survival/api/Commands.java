@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import ru.sliva.survival.command.AbstractCommand;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,7 +39,7 @@ public final class Commands implements Listener {
     }
 
     public static void unregisterCommands(@NotNull Plugin plugin) {
-        for(Command cmd : commandMap.getCommands()) {
+        for(Command cmd : new ArrayList<>(commandMap.getCommands())) {
             if(cmd instanceof AbstractCommand) {
                 AbstractCommand abstractCommand = (AbstractCommand) cmd;
                 if(Objects.equals(abstractCommand.getPlugin(), plugin)) {

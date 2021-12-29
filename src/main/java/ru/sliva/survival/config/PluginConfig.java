@@ -7,5 +7,6 @@ public final class PluginConfig extends Config {
 
     public PluginConfig(@NotNull Plugin plugin) {
         super(plugin, "config.yml");
+        saveDefaultConfig();
     }
 }

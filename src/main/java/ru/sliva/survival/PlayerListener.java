@@ -6,6 +6,8 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -16,15 +18,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.command.UnknownCommandEvent;
-import org.bukkit.event.player.PlayerEditBookEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.BookMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import ru.sliva.survival.api.Slezhka;
 import ru.sliva.survival.config.PlayersConfig;
 import ru.sliva.survival.config.PluginConfig;
 import ru.sliva.survival.config.SPlayer;
 
+import javax.xml.soap.Text;
 import java.util.*;
 
 public class PlayerListener implements Listener {
@@ -93,26 +96,14 @@ public class PlayerListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            e.renderer(ChatRenderer.viewerUnaware((source, sourceDisplayName, msg) -> {
-                Component globalChat = Component.text("Ⓖ ").color(NamedTextColor.GREEN);
-                Component rendered = ampersandSerializer.deserialize(config.getString("messages.chatFormat"));
-                rendered = rendered.replaceText(builder -> builder.matchLiteral("<player>").replacement(sourceDisplayName.color(NamedTextColor.GRAY)));
-                rendered = rendered.replaceText(builder -> builder.matchLiteral("<message>").replacement(msg.color(NamedTextColor.GRAY)));
-                return globalChat.append(rendered);
-            }));
+            e.renderer(constructChatRenderer(true));
         } else {
             e.message(message);
             if(Objects.equals(literalMessage, "")) {
                 e.setCancelled(true);
                 return;
             }
-            e.renderer(ChatRenderer.viewerUnaware((source, sourceDisplayName, msg) -> {
-                Component localChat = Component.text("Ⓛ ").color(NamedTextColor.YELLOW);
-                Component rendered = ampersandSerializer.deserialize(config.getString("messages.chatFormat"));
-                rendered = rendered.replaceText(builder -> builder.matchLiteral("<player>").replacement(sourceDisplayName.color(NamedTextColor.GRAY)));
-                rendered = rendered.replaceText(builder -> builder.matchLiteral("<message>").replacement(msg.color(NamedTextColor.GRAY)));
-                return localChat.append(rendered);
-            }));
+            e.renderer(constructChatRenderer(false));
             Set<Audience> viewers = e.viewers();
             for(Audience audience : new HashSet<>(viewers)) {
                 if(audience instanceof Player) {
@@ -126,6 +117,35 @@ public class PlayerListener implements Listener {
                 p.sendMessage(ampersandSerializer.deserialize(config.getString("messages.nobodyHeard")));
             }
         }
+    }
+
+    @Contract(value = "_ -> new", pure = true)
+    private @NotNull ChatRenderer constructChatRenderer(boolean global) {
+        return ChatRenderer.viewerUnaware((source, sourceDisplayName, message) -> {
+            Component chat;
+            if(global) {
+                chat = Component.text("Ⓖ ").color(NamedTextColor.GREEN);
+            } else {
+                chat = Component.text("Ⓛ ").color(NamedTextColor.YELLOW);
+            }
+
+            TextComponent textMessage = (TextComponent) message.color(NamedTextColor.GRAY);
+            textMessage = textMessage.hoverEvent(HoverEvent.showText(ampersandSerializer.deserialize(config.getString("hoverEvents.copyChatMessage"))));
+            textMessage = textMessage.clickEvent(ClickEvent.copyToClipboard(textMessage.content()));
+            final TextComponent finalMessage = textMessage;
+
+            TextComponent textDisplayName = (TextComponent) sourceDisplayName.color(NamedTextColor.WHITE);
+            Component sendMessage = ampersandSerializer.deserialize(config.getString("hoverEvents.sendMessage"));
+            sendMessage = sendMessage.replaceText(builder -> builder.matchLiteral("<player>").replacement(sourceDisplayName));
+            textDisplayName = textDisplayName.hoverEvent(HoverEvent.showText(sendMessage));
+            textDisplayName = textDisplayName.clickEvent(ClickEvent.suggestCommand("/tell " + source.getName() + " "));
+            final TextComponent finalName = textDisplayName;
+
+            Component rendered = ampersandSerializer.deserialize(config.getString("messages.chatFormat"));
+            rendered = rendered.replaceText(builder -> builder.matchLiteral("<player>").replacement(finalName));
+            rendered = rendered.replaceText(builder -> builder.matchLiteral("<message>").replacement(finalMessage));
+            return chat.append(rendered);
+        });
     }
 
     private boolean outOfRange(@NotNull Location l, Location ll) {
@@ -187,5 +207,24 @@ public class PlayerListener implements Listener {
         }
         newMeta.pages(updatedPages);
         e.setNewBookMeta(newMeta);
+    }
+
+    @EventHandler
+    public void onKick(@NotNull PlayerKickEvent e) {
+        Player p = e.getPlayer();
+        Component format = ampersandSerializer.deserialize(config.getString("commands.slezhka.kick"));
+        format = format.replaceText(builder -> builder.matchLiteral("<player>").replacement(p.displayName().color(NamedTextColor.WHITE)));
+        format = format.replaceText(builder -> builder.matchLiteral("<cause>").replacement(e.getCause().name().toLowerCase()));
+        format = format.replaceText(builder -> builder.matchLiteral("<message>").replacement(e.reason().color(NamedTextColor.GRAY)));
+        Slezhka.send(format);
+    }
+
+    @EventHandler
+    public void onCommandPreprocess(@NotNull PlayerCommandPreprocessEvent e) {
+        Player p = e.getPlayer();
+        Component format = ampersandSerializer.deserialize(config.getString("commands.slezhka.command"));
+        format = format.replaceText(builder -> builder.matchLiteral("<player>").replacement(p.displayName().color(NamedTextColor.WHITE)));
+        format = format.replaceText(builder -> builder.matchLiteral("<command>").replacement(e.getMessage()));
+        Slezhka.send(format);
     }
 }
