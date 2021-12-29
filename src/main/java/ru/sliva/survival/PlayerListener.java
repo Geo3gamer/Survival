@@ -27,7 +27,6 @@ import ru.sliva.survival.config.PlayersConfig;
 import ru.sliva.survival.config.PluginConfig;
 import ru.sliva.survival.config.SPlayer;
 
-import javax.xml.soap.Text;
 import java.util.*;
 
 public class PlayerListener implements Listener {

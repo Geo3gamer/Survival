@@ -1,23 +1,17 @@
 package ru.sliva.survival.command;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.sliva.survival.Survival;
 import ru.sliva.survival.Utils;
-import ru.sliva.survival.api.Slezhka;
 import ru.sliva.survival.config.PluginConfig;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class SudoCommand extends AbstractCommand{
@@ -25,7 +19,6 @@ public class SudoCommand extends AbstractCommand{
     private final PluginConfig config;
 
     private final LegacyComponentSerializer ampersandSerializer = LegacyComponentSerializer.legacyAmpersand();
-    private final LegacyComponentSerializer paragraphSerializer = LegacyComponentSerializer.legacySection();
 
     public SudoCommand(@NotNull Survival plugin) {
         super(plugin, "sudo", "Выполнить команду от имени игрока", "/sudo <игрок> </команда>", "survival.sudo");
