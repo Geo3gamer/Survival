@@ -1,4 +1,4 @@
-package ru.sliva.survival.config;
+package ru.sliva.api;
 
 import com.google.common.base.Charsets;
 import org.bukkit.ChatColor;
@@ -14,12 +14,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public class Config extends YamlConfiguration {
+@Deprecated
+public class BukkitConfig extends YamlConfiguration {
 
     private final File file;
     private final Plugin plugin;
 
-    public Config(@NotNull Plugin plugin, @NotNull String filename) {
+    public BukkitConfig(@NotNull Plugin plugin, @NotNull String filename) {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), filename);
         reloadConfig();

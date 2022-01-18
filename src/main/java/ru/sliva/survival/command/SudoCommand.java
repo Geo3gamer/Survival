@@ -8,21 +8,24 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.sliva.api.TextUtil;
+import ru.sliva.api.Translatable;
+import ru.sliva.api.Utils;
+import ru.sliva.api.command.AbstractCommand;
 import ru.sliva.survival.Survival;
-import ru.sliva.survival.Utils;
 import ru.sliva.survival.config.PluginConfig;
 
 import java.util.List;
 
-public class SudoCommand extends AbstractCommand{
+public class SudoCommand extends AbstractCommand {
 
     private final PluginConfig config;
 
-    private final LegacyComponentSerializer ampersandSerializer = LegacyComponentSerializer.legacyAmpersand();
+    private final LegacyComponentSerializer configSerializer = TextUtil.configSerializer;
 
     public SudoCommand(@NotNull Survival plugin) {
         super(plugin, "sudo", "Выполнить команду от имени игрока", "/sudo <игрок> </команда>", "survival.sudo");
-        this.config = plugin.getConfig();
+        this.config = plugin.getPluginConfig();
     }
 
     @Override
@@ -30,14 +33,14 @@ public class SudoCommand extends AbstractCommand{
         if(args.length > 1) {
             Player p = Bukkit.getPlayerExact(args[0]);
             if(p == null) {
-                sender.sendMessage(Utils.constructPlayerIsOffline(args[0]));
+                sender.sendMessage(Translatable.PLAYER_NOT_FOUND.getComponent());
                 return true;
             }
             String command = Utils.stringFromArray(args, 1, " ");
 
-            Component executed = ampersandSerializer.deserialize(config.getString("commands.sudo.executed"));
-            executed = executed.replaceText(builder -> builder.matchLiteral("<player>").replacement(p.displayName()));
-            executed = executed.replaceText(builder -> builder.matchLiteral("<command>").replacement(Component.text(command).color(NamedTextColor.GRAY)));
+            Component executed = configSerializer.deserialize(TextUtil.fromNullable(config.getCommand("sudo").node("executed").getString()));
+            executed = executed.replaceText(builder -> builder.matchLiteral("{player}").replacement(p.displayName()));
+            executed = executed.replaceText(builder -> builder.matchLiteral("{command}").replacement(Component.text(command).color(NamedTextColor.GRAY)));
 
             p.chat(command);
 

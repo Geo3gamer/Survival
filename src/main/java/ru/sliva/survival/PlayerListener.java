@@ -11,6 +11,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,23 +23,27 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import ru.sliva.survival.api.Slezhka;
-import ru.sliva.survival.config.PlayersConfig;
+import org.spongepowered.configurate.ConfigurationNode;
+import ru.sliva.api.Slezhka;
+import ru.sliva.api.TextUtil;
 import ru.sliva.survival.config.PluginConfig;
-import ru.sliva.survival.config.SPlayer;
 
 import java.util.*;
 
 public class PlayerListener implements Listener {
 
-    private final PlayersConfig playersConfig;
-    private final PluginConfig config;
+    private final ConfigurationNode messages;
+    private final ConfigurationNode hoverEvents;
+    private final ConfigurationNode slezhka;
     private final LegacyComponentSerializer ampersandSerializer = LegacyComponentSerializer.legacyAmpersand();
     private final LegacyComponentSerializer paragraphSerializer = LegacyComponentSerializer.legacySection();
+    private final LegacyComponentSerializer configSerializer = TextUtil.configSerializer;
 
     public PlayerListener(@NotNull Survival plugin) {
-        this.playersConfig = plugin.getPlayersConfig();
-        this.config = plugin.getConfig();
+        PluginConfig config = plugin.getPluginConfig();
+        this.messages = config.getMessages();
+        this.hoverEvents = config.getHoverEvents();
+        this.slezhka = config.getCommand("slezhka");
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -46,11 +51,8 @@ public class PlayerListener implements Listener {
     public void onJoin(@NotNull PlayerJoinEvent e) {
         e.joinMessage(null);
         Player p = e.getPlayer();
-        if(playersConfig.getPlayer(p.getName()) == null) {
-            playersConfig.set(p.getName(), new SPlayer());
-        }
-        Component join = ampersandSerializer.deserialize(config.getString("messages.join"));
-        join = join.replaceText(builder -> builder.matchLiteral("<target>").replacement(p.displayName()));
+        Component join = configSerializer.deserialize(TextUtil.fromNullable(messages.node("join").getString()));
+        join = join.replaceText(builder -> builder.matchLiteral("{target}").replacement(p.displayName()));
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendActionBar(join);
         }
@@ -61,8 +63,8 @@ public class PlayerListener implements Listener {
     public void onQuit(@NotNull PlayerQuitEvent e) {
         e.quitMessage(null);
         Player p = e.getPlayer();
-        Component quit = ampersandSerializer.deserialize(config.getString("messages.quit"));
-        quit = quit.replaceText(builder -> builder.match("<target>").replacement(p.displayName()));
+        Component quit = configSerializer.deserialize(TextUtil.fromNullable(messages.node("quit").getString()));
+        quit = quit.replaceText(builder -> builder.match("{target}").replacement(p.displayName()));
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendActionBar(quit);
         }
@@ -71,38 +73,35 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPing(@NotNull PaperServerListPingEvent event) {
-        event.motd(ampersandSerializer.deserialize(config.getString("messages.motd")));
+        event.motd(configSerializer.deserialize(TextUtil.fromNullable(messages.node("motd").getString())));
         event.setMaxPlayers(event.getNumPlayers() + 1);
         event.setProtocolVersion(-1);
-        event.setVersion(config.getColorizedString("messages.listPlayers").replace("<min>", String.valueOf(event.getNumPlayers())).replace("<max>", String.valueOf(event.getMaxPlayers())));
+        event.setVersion(ChatColor.translateAlternateColorCodes('%', TextUtil.fromNullable(messages.node("listPlayers").getString()).replace("{min}", String.valueOf(event.getNumPlayers())).replace("{max}", String.valueOf(event.getMaxPlayers()))));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(final @NotNull AsyncChatEvent e) {
         Player p = e.getPlayer();
+
         Component message = e.message();
         if(p.hasPermission("survival.color")) {
             message = ampersandSerializer.deserialize(ampersandSerializer.serialize(message));
         }
         message = message.replaceText(builder -> builder.match("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b").replacement(""));
         message = message.replaceText(builder -> builder.match("^[ \\t]+|[ \\t]+(?=\\s)").replacement(""));
+
         String literalMessage = paragraphSerializer.serialize(message);
+
+        e.message(message);
+
+        boolean global = false;
+
         if(literalMessage.startsWith("!")) {
             message = message.replaceText(builder -> builder.matchLiteral("!").once().replacement(""));
             e.message(message);
             literalMessage = paragraphSerializer.serialize(message);
-            if(Objects.equals(literalMessage, "")) {
-                e.setCancelled(true);
-                return;
-            }
-            e.renderer(constructChatRenderer(true));
+            global = true;
         } else {
-            e.message(message);
-            if(Objects.equals(literalMessage, "")) {
-                e.setCancelled(true);
-                return;
-            }
-            e.renderer(constructChatRenderer(false));
             Set<Audience> viewers = e.viewers();
             for(Audience audience : new HashSet<>(viewers)) {
                 if(audience instanceof Player) {
@@ -113,9 +112,16 @@ public class PlayerListener implements Listener {
                 }
             }
             if(viewers.size() == 2) {
-                p.sendMessage(ampersandSerializer.deserialize(config.getString("messages.nobodyHeard")));
+                p.sendMessage(ampersandSerializer.deserialize(TextUtil.fromNullable(messages.node("nobodyHeard").getString())));
             }
         }
+
+        if(Objects.equals(literalMessage, "")) {
+            e.setCancelled(true);
+            return;
+        }
+
+        e.renderer(constructChatRenderer(global));
     }
 
     @Contract(value = "_ -> new", pure = true)
@@ -129,20 +135,20 @@ public class PlayerListener implements Listener {
             }
 
             TextComponent textMessage = (TextComponent) message.color(NamedTextColor.GRAY);
-            textMessage = textMessage.hoverEvent(HoverEvent.showText(ampersandSerializer.deserialize(config.getString("hoverEvents.copyChatMessage"))));
+            textMessage = textMessage.hoverEvent(HoverEvent.showText(ampersandSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("copyChatMessage").getString()))));
             textMessage = textMessage.clickEvent(ClickEvent.copyToClipboard(textMessage.content()));
             final TextComponent finalMessage = textMessage;
 
             TextComponent textDisplayName = (TextComponent) sourceDisplayName.color(NamedTextColor.WHITE);
-            Component sendMessage = ampersandSerializer.deserialize(config.getString("hoverEvents.sendMessage"));
-            sendMessage = sendMessage.replaceText(builder -> builder.matchLiteral("<player>").replacement(sourceDisplayName));
+            Component sendMessage = ampersandSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("sendMessage").getString()));
+            sendMessage = sendMessage.replaceText(builder -> builder.matchLiteral("{player}").replacement(sourceDisplayName));
             textDisplayName = textDisplayName.hoverEvent(HoverEvent.showText(sendMessage));
             textDisplayName = textDisplayName.clickEvent(ClickEvent.suggestCommand("/tell " + source.getName() + " "));
             final TextComponent finalName = textDisplayName;
 
-            Component rendered = ampersandSerializer.deserialize(config.getString("messages.chatFormat"));
-            rendered = rendered.replaceText(builder -> builder.matchLiteral("<player>").replacement(finalName));
-            rendered = rendered.replaceText(builder -> builder.matchLiteral("<message>").replacement(finalMessage));
+            Component rendered = ampersandSerializer.deserialize(TextUtil.fromNullable(messages.node("chatFormat").getString()));
+            rendered = rendered.replaceText(builder -> builder.matchLiteral("{player}").replacement(finalName));
+            rendered = rendered.replaceText(builder -> builder.matchLiteral("{message}").replacement(finalMessage));
             return chat.append(rendered);
         });
     }
@@ -186,7 +192,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void unknownCommand(@NotNull UnknownCommandEvent e) {
-        e.message(ampersandSerializer.deserialize(config.getString("messages.unknownCommand")));
+        e.message(ampersandSerializer.deserialize(TextUtil.fromNullable(messages.node("unknownCommand").getString())));
     }
 
     @EventHandler
@@ -211,19 +217,19 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onKick(@NotNull PlayerKickEvent e) {
         Player p = e.getPlayer();
-        Component format = ampersandSerializer.deserialize(config.getString("commands.slezhka.kick"));
-        format = format.replaceText(builder -> builder.matchLiteral("<player>").replacement(p.displayName().color(NamedTextColor.WHITE)));
-        format = format.replaceText(builder -> builder.matchLiteral("<cause>").replacement(e.getCause().name().toLowerCase()));
-        format = format.replaceText(builder -> builder.matchLiteral("<message>").replacement(e.reason().color(NamedTextColor.GRAY)));
+        Component format = ampersandSerializer.deserialize(TextUtil.fromNullable(slezhka.node("kick").getString()));
+        format = format.replaceText(builder -> builder.matchLiteral("{player}").replacement(p.displayName().color(NamedTextColor.WHITE)));
+        format = format.replaceText(builder -> builder.matchLiteral("{cause}").replacement(e.getCause().name().toLowerCase()));
+        format = format.replaceText(builder -> builder.matchLiteral("{message}").replacement(e.reason().color(NamedTextColor.GRAY)));
         Slezhka.send(format);
     }
 
     @EventHandler
     public void onCommandPreprocess(@NotNull PlayerCommandPreprocessEvent e) {
         Player p = e.getPlayer();
-        Component format = ampersandSerializer.deserialize(config.getString("commands.slezhka.command"));
-        format = format.replaceText(builder -> builder.matchLiteral("<player>").replacement(p.displayName().color(NamedTextColor.WHITE)));
-        format = format.replaceText(builder -> builder.matchLiteral("<command>").replacement(e.getMessage()));
+        Component format = ampersandSerializer.deserialize(TextUtil.fromNullable(slezhka.node("command").getString()));
+        format = format.replaceText(builder -> builder.matchLiteral("{player}").replacement(p.displayName().color(NamedTextColor.WHITE)));
+        format = format.replaceText(builder -> builder.matchLiteral("{command}").replacement(e.getMessage()));
         Slezhka.send(format);
     }
 }

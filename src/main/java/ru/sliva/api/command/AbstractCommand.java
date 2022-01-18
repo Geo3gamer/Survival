@@ -1,4 +1,4 @@
-package ru.sliva.survival.command;
+package ru.sliva.api.command;
 
 import org.bukkit.command.*;
 import org.bukkit.plugin.Plugin;

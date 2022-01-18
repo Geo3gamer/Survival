@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <messages>
+        <join>{target} %aприсоединился к игре.</join>
+        <quit>{target} %cпокинул игру.</quit>
+        <motd>%a%l| %aArt%a%lGame %aSurvival %b%k| %b%l%n1.9 - 1.18.1&#xA;%a%l| %aКлассическое выживание</motd>
+        <listPlayers>%e%l{min}%8/%e%l{max}</listPlayers>
+        <chatFormat>{player}%8 » {message}</chatFormat>
+        <nobodyHeard>%cВас никто не слышит.</nobodyHeard>
+        <unknownCommand>%fНеизвестная команда.</unknownCommand>
+        <tabHeader>&#xA;%9%lArt%c%lGame %6%lSurvival&#xA;%fОнлайн: %a%l{online}&#xA;%fПинг: %a%l{ping}&#xA;</tabHeader>
+    </messages>
+
+    <hoverEvents>
+        <copyChatMessage>%fСкопировать сообщение</copyChatMessage>
+        <sendMessage>%fОтправить {player} %fсообщение</sendMessage>
+        <copyPrivateMessage>%fСкопировать личное сообщение</copyPrivateMessage>
+        <reply>%7Ответить</reply>
+    </hoverEvents>
+
+    <commands>
+        <tell>
+            <fromSender>%2[%r{s} %a-> %r{t}%2]%8 » {msg}</fromSender>
+            <onTarget>%3[%r{t} %b&lt;- %r{s}%3]%8 » {msg}</onTarget>
+        </tell>
+        <slezhka>
+            <enabled>%aСлежка включена.</enabled>
+            <disabled>%cСлежка выключена.</disabled>
+            <kick>%c[Kick] (%r{player}%c) [{cause}] %8» %r{message}</kick>
+            <command>%a[Command] (%r{player}%a) %8» %f{command}</command>
+        </slezhka>
+        <sudo>
+            <executed>%a[%r{player}%a]%8 » {command}</executed>
+        </sudo>
+    </commands>
+</root>

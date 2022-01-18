@@ -1,16 +1,21 @@
-package ru.sliva.survival.api;
+package ru.sliva.api;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
-import ru.sliva.survival.Survival;
 
 public final class Schedule {
 
-    private static final Plugin plugin = Survival.getInstance();
+    private static Plugin plugin;
     private static final BukkitScheduler scheduler = Bukkit.getScheduler();
+
+    public static void setup(@NotNull Plugin plugin) {
+        if(Schedule.plugin == null) {
+            Schedule.plugin = plugin;
+        }
+    }
 
     @NotNull
     public static BukkitTask later(@NotNull Runnable task, long delay) {

@@ -1,4 +1,4 @@
-package ru.sliva.survival.api;
+package ru.sliva.api.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import ru.sliva.survival.command.AbstractCommand;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -15,7 +14,14 @@ import java.util.Objects;
 
 public final class Commands implements Listener {
 
+    private static Plugin plugin;
     private static final SimpleCommandMap commandMap = (SimpleCommandMap) Bukkit.getCommandMap();
+
+    public static void setup(Plugin plugin) {
+        if(Commands.plugin == null) {
+            Commands.plugin = plugin;
+        }
+    }
 
     public static void unregisterCommand(@NotNull AbstractCommand cmd) {
         Map<String, Command> knownCommands = commandMap.getKnownCommands();
@@ -38,7 +44,7 @@ public final class Commands implements Listener {
         }
     }
 
-    public static void unregisterCommands(@NotNull Plugin plugin) {
+    public static void unregisterCommands() {
         for(Command cmd : new ArrayList<>(commandMap.getCommands())) {
             if(cmd instanceof AbstractCommand) {
                 AbstractCommand abstractCommand = (AbstractCommand) cmd;

@@ -1,37 +1,25 @@
 package ru.sliva.survival;
 
-import net.luckperms.api.LuckPerms;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import ru.sliva.survival.api.Commands;
+import ru.sliva.api.API;
+import ru.sliva.api.command.Commands;
 import ru.sliva.survival.command.SlezhkaCommand;
 import ru.sliva.survival.command.SudoCommand;
 import ru.sliva.survival.command.TellCommand;
-import ru.sliva.survival.config.PlayersConfig;
 import ru.sliva.survival.config.PluginConfig;
 
 public class Survival extends JavaPlugin {
 
-	private PlayersConfig playersConfig;
 	private PluginConfig config;
-
-	public LuckPerms luckPerms;
-
-	public static Survival instance;
 	
 	@Override
 	public void onEnable() {
-		instance = this;
+		API.setup(this);
 
-		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-		if(provider != null) {
-			luckPerms = provider.getProvider();
-		}
+		getDataFolder().mkdirs();
 		
 		config = new PluginConfig(this);
-		playersConfig = new PlayersConfig(this);
 
 		new PlayerListener(this);
 		new TabList(this);
@@ -42,22 +30,13 @@ public class Survival extends JavaPlugin {
 		Commands.registerCommand(new SudoCommand(this));
 	}
 
-	public static Survival getInstance() {
-		return instance;
-	}
-
 	@Override
 	public void onDisable() {
-		Commands.unregisterCommands(this);
+		Commands.unregisterCommands();
 	}
 
 	@NotNull
-	@Override
-	public PluginConfig getConfig() {
+	public PluginConfig getPluginConfig() {
 		return config;
-	}
-
-	public PlayersConfig getPlayersConfig() {
-		return playersConfig;
 	}
 }

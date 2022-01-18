@@ -4,7 +4,8 @@ import fr.minuskube.netherboard.Netherboard;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import ru.sliva.survival.api.Schedule;
+import ru.sliva.api.Schedule;
+import ru.sliva.api.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package ru.sliva.survival.api;
+package ru.sliva.api;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
