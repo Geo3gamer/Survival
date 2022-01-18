@@ -121,6 +121,7 @@ public class PlayerListener implements Listener {
             for(Player viewer : new HashSet<>(event.getRecipients())) {
                 Audiences.player(viewer).sendMessage(rendered);
             }
+            Audiences.sender(Bukkit.getConsoleSender()).sendMessage(rendered);
         }
     }
 
