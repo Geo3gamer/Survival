@@ -35,7 +35,6 @@ public final class Commands implements Listener {
                 }
             }
         }
-        updateCommands();
     }
 
     public static void registerCommand(AbstractCommand @NotNull ... commands) {
@@ -53,9 +52,5 @@ public final class Commands implements Listener {
                 }
             }
         }
-    }
-
-    private static void updateCommands() {
-        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
     }
 }

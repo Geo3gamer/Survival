@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import ru.sliva.api.legacy.Audiences;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ public final class Slezhka {
 
     public static void send(@NotNull Component component) {
         for(UUID uuid : spies) {
-            Player p = Bukkit.getPlayer(uuid);
-            if(p != null) {
-                p.sendMessage(spying.append(component));
+            Player player = Bukkit.getPlayer(uuid);
+            if(player != null) {
+                Audiences.player(player).sendMessage(component);
             }
         }
     }

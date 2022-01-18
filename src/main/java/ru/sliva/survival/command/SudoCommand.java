@@ -12,6 +12,7 @@ import ru.sliva.api.TextUtil;
 import ru.sliva.api.Translatable;
 import ru.sliva.api.Utils;
 import ru.sliva.api.command.AbstractCommand;
+import ru.sliva.api.legacy.Audiences;
 import ru.sliva.survival.Survival;
 import ru.sliva.survival.config.PluginConfig;
 
@@ -31,20 +32,20 @@ public class SudoCommand extends AbstractCommand {
     @Override
     public boolean exec(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String @NotNull [] args) {
         if(args.length > 1) {
-            Player p = Bukkit.getPlayerExact(args[0]);
-            if(p == null) {
-                sender.sendMessage(Translatable.PLAYER_NOT_FOUND.getComponent());
+            Player player = Bukkit.getPlayerExact(args[0]);
+            if(player == null) {
+                sender.sendMessage(Translatable.PLAYER_NOT_FOUND.getString());
                 return true;
             }
             String command = Utils.stringFromArray(args, 1, " ");
 
             Component executed = configSerializer.deserialize(TextUtil.fromNullable(config.getCommand("sudo").node("executed").getString()));
-            executed = executed.replaceText(builder -> builder.matchLiteral("{player}").replacement(p.displayName()));
+            executed = executed.replaceText(builder -> builder.matchLiteral("{player}").replacement(TextUtil.getDisplayName(player)));
             executed = executed.replaceText(builder -> builder.matchLiteral("{command}").replacement(Component.text(command).color(NamedTextColor.GRAY)));
 
-            p.chat(command);
+            player.chat(command);
 
-            sender.sendMessage(executed);
+            Audiences.sender(sender).sendMessage(executed);
             return true;
         }
         return false;

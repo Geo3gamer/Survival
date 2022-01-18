@@ -31,15 +31,15 @@ public class SlezhkaCommand extends AbstractCommand {
         if(args.length < 1) {
             if(sender instanceof Player) {
                 ConfigurationNode command = config.getCommand("slezhka");
-                Player p = (Player) sender;
-                UUID uuid = p.getUniqueId();
+                Player player = (Player) sender;
+                UUID uuid = player.getUniqueId();
                 List<UUID> spies = Slezhka.spies;
                 if(spies.contains(uuid)) {
                     spies.remove(uuid);
-                    p.sendMessage(configSerializer.deserialize(TextUtil.fromNullable(command.node("disabled").getString())));
+                    player.sendMessage(TextUtil.colorConfig(TextUtil.fromNullable(command.node("disabled").getString())));
                 } else {
                     spies.add(uuid);
-                    p.sendMessage(configSerializer.deserialize(TextUtil.fromNullable(command.node("enabled").getString())));
+                    player.sendMessage(TextUtil.colorConfig(TextUtil.fromNullable(command.node("enabled").getString())));
                 }
             }
             return true;

@@ -16,6 +16,7 @@ import ru.sliva.api.TextUtil;
 import ru.sliva.api.Translatable;
 import ru.sliva.api.Utils;
 import ru.sliva.api.command.AbstractCommand;
+import ru.sliva.api.legacy.Audiences;
 import ru.sliva.survival.Survival;
 import ru.sliva.api.Slezhka;
 import ru.sliva.survival.config.PluginConfig;
@@ -39,9 +40,9 @@ public class TellCommand extends AbstractCommand {
     @Override
     public boolean exec(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String @NotNull [] args) {
         if(args.length > 1) {
-            Player p = Bukkit.getPlayerExact(args[0]);
-            if(p == null) {
-                sender.sendMessage(Translatable.PLAYER_NOT_FOUND.getComponent());
+            Player player = Bukkit.getPlayerExact(args[0]);
+            if(player == null) {
+                sender.sendMessage(Translatable.PLAYER_NOT_FOUND.getString());
                 return true;
             }
 
@@ -57,19 +58,19 @@ public class TellCommand extends AbstractCommand {
             final TextComponent finalMessage = message;
 
             Component fromSender = configSerializer.deserialize(TextUtil.fromNullable(command.node("fromSender").getString()));
-            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayName(sender).color(NamedTextColor.WHITE)));
-            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{t}").replacement(p.displayName().color(NamedTextColor.WHITE)));
+            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayNameSender(sender).color(NamedTextColor.WHITE)));
+            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{t}").replacement(TextUtil.getDisplayName(player).color(NamedTextColor.WHITE)));
             fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{msg}").replacement(finalMessage));
 
             Component onTarget = configSerializer.deserialize(TextUtil.fromNullable(command.node("onTarget").getString()));
-            onTarget = onTarget.hoverEvent(HoverEvent.showText(ampersandSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("reply").getString()))));
+            onTarget = onTarget.hoverEvent(HoverEvent.showText(configSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("reply").getString()))));
             onTarget = onTarget.clickEvent(ClickEvent.suggestCommand("/tell " + sender.getName()));
-            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayName(sender).color(NamedTextColor.WHITE)));
-            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{t}").replacement(p.displayName().color(NamedTextColor.WHITE)));
+            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayNameSender(sender).color(NamedTextColor.WHITE)));
+            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{t}").replacement(TextUtil.getDisplayName(player).color(NamedTextColor.WHITE)));
             onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{msg}").replacement(finalMessage));
 
-            sender.sendMessage(fromSender);
-            p.sendMessage(onTarget);
+            Audiences.sender(sender).sendMessage(fromSender);
+            Audiences.player(player).sendMessage(onTarget);
 
             Slezhka.send(fromSender);
             return true;
