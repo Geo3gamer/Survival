@@ -8,7 +8,7 @@
         <chatFormat>{player}%8 » {message}</chatFormat>
         <nobodyHeard>%cВас никто не слышит.</nobodyHeard>
         <unknownCommand>%fНеизвестная команда.</unknownCommand>
-        <tabHeader>&#xA;%9%lArt%c%lGame %6%lSurvival&#xA;%fОнлайн: %a%l{online}&#xA;%fПинг: %a%l{ping}&#xA;</tabHeader>
+        <tabHeader>&#xA;%c%lTest&#xA;%fОнлайн: %a%l{online}&#xA;%fПинг: %a%l{ping}&#xA;</tabHeader>
     </messages>
 
     <hoverEvents>
