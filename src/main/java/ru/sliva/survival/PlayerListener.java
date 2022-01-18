@@ -24,6 +24,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
+import ru.sliva.api.Events;
 import ru.sliva.api.Slezhka;
 import ru.sliva.api.TextUtil;
 import ru.sliva.survival.config.PluginConfig;
@@ -44,7 +45,7 @@ public class PlayerListener implements Listener {
         this.messages = config.getMessages();
         this.hoverEvents = config.getHoverEvents();
         this.slezhka = config.getCommand("slezhka");
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Events.registerListener(this);
     }
 
     @EventHandler
