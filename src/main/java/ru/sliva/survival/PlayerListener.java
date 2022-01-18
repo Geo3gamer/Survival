@@ -203,6 +203,10 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onKick(@NotNull PlayerKickEvent event) {
+        if (event.getReason().equalsIgnoreCase("Kicked for spamming")) {
+            event.setCancelled(true);
+        }
+
         Player player = event.getPlayer();
         Component format = configSerializer.deserialize(TextUtil.fromNullable(slezhka.node("kick").getString()));
         format = format.replaceText(builder -> builder.matchLiteral("{player}").replacement(TextUtil.getDisplayName(player).color(NamedTextColor.WHITE)));
