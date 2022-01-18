@@ -30,7 +30,7 @@ public class Sidebar implements Runnable {
             board = Netherboard.instance().createBoard(p, "");
         }
 
-        board.setName("§с§lTest");
+        board.setName("§c§lTest");
 
         List<String> list = new ArrayList<>(Arrays.asList(
                 "§r",
