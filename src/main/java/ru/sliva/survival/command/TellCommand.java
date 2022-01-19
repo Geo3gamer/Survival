@@ -11,30 +11,26 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.configurate.ConfigurationNode;
+import ru.sliva.api.Slezhka;
 import ru.sliva.api.TextUtil;
 import ru.sliva.api.Translatable;
 import ru.sliva.api.Utils;
 import ru.sliva.api.command.AbstractCommand;
 import ru.sliva.api.legacy.Audiences;
 import ru.sliva.survival.Survival;
-import ru.sliva.api.Slezhka;
-import ru.sliva.survival.config.PluginConfig;
+import ru.sliva.survival.config.Cmds;
+import ru.sliva.survival.config.HoverEvents;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class TellCommand extends AbstractCommand {
-
-    private final PluginConfig config;
+public final class TellCommand extends AbstractCommand {
 
     private final LegacyComponentSerializer ampersandSerializer = LegacyComponentSerializer.legacyAmpersand();
     private final LegacyComponentSerializer paragraphSerializer = LegacyComponentSerializer.legacySection();
-    private final LegacyComponentSerializer configSerializer = TextUtil.configSerializer;
 
     public TellCommand(@NotNull Survival plugin) {
         super(plugin, "tell", "Отправить игроку личное сообщение", "/tell <игрок> <сообщение>", Arrays.asList("w", "msg"));
-        this.config = plugin.getPluginConfig();
     }
 
     @Override
@@ -46,28 +42,20 @@ public class TellCommand extends AbstractCommand {
                 return true;
             }
 
-            ConfigurationNode command = config.getCommand("tell");
-            ConfigurationNode hoverEvents = config.getHoverEvents();
-
             TextComponent message = paragraphSerializer.deserialize(Utils.stringFromArray(args, 1, " ")).color(NamedTextColor.GRAY);
             if(sender.hasPermission("survival.color")) {
                 message = ampersandSerializer.deserialize(ampersandSerializer.serialize(message));
             }
-            message = message.hoverEvent(HoverEvent.showText(configSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("copyPrivateMessage").getString()))));
+            message = (TextComponent) TextUtil.removeBadWords(message);
+            message = message.hoverEvent(HoverEvent.showText(HoverEvents.copyPrivateMessage.getComponent()));
             message = message.clickEvent(ClickEvent.copyToClipboard(message.content()));
             final TextComponent finalMessage = message;
 
-            Component fromSender = configSerializer.deserialize(TextUtil.fromNullable(command.node("fromSender").getString()));
-            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayNameSender(sender).color(NamedTextColor.WHITE)));
-            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{t}").replacement(TextUtil.getDisplayName(player).color(NamedTextColor.WHITE)));
-            fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{msg}").replacement(finalMessage));
+            Component fromSender = Cmds.tell_fromSender.defineSender(sender).defineTarget(player).defineMessage(finalMessage).getComponent();
 
-            Component onTarget = configSerializer.deserialize(TextUtil.fromNullable(command.node("onTarget").getString()));
-            onTarget = onTarget.hoverEvent(HoverEvent.showText(configSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("reply").getString()))));
+            Component onTarget = Cmds.tell_toTarget.defineSender(sender).defineTarget(player).defineMessage(finalMessage).getComponent();
+            onTarget = onTarget.hoverEvent(HoverEvent.showText(HoverEvents.reply.getComponent()));
             onTarget = onTarget.clickEvent(ClickEvent.suggestCommand("/tell " + sender.getName()));
-            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayNameSender(sender).color(NamedTextColor.WHITE)));
-            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{t}").replacement(TextUtil.getDisplayName(player).color(NamedTextColor.WHITE)));
-            onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{msg}").replacement(finalMessage));
 
             Audiences.sender(sender).sendMessage(fromSender);
             Audiences.player(player).sendMessage(onTarget);

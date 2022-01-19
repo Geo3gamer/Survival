@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Sidebar implements Runnable {
+public final class Sidebar implements Runnable {
 
     public Sidebar() {
         Schedule.timer(this, 20);

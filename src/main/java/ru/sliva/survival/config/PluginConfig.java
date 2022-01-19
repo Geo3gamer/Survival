@@ -3,10 +3,9 @@ package ru.sliva.survival.config;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.serialize.SerializationException;
 import ru.sliva.api.XMLConfig;
 
-public class PluginConfig extends XMLConfig {
+public final class PluginConfig extends XMLConfig {
 
     private final ConfigurationNode messages;
     private final ConfigurationNode hoverEvents;

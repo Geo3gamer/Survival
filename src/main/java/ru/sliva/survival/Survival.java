@@ -9,20 +9,24 @@ import ru.sliva.survival.command.SudoCommand;
 import ru.sliva.survival.command.TellCommand;
 import ru.sliva.survival.config.PluginConfig;
 
-public class Survival extends JavaPlugin {
+public final class Survival extends JavaPlugin {
 
 	private PluginConfig config;
+
+	private static Survival instance;
 	
 	@Override
 	public void onEnable() {
+		instance = this;
+
 		API.setup(this);
 
 		getDataFolder().mkdirs();
 		
 		config = new PluginConfig(this);
 
-		new PlayerListener(this);
-		new TabList(this);
+		new PlayerListener();
+		new TabList();
 		new Sidebar();
 
 		Commands.registerCommand(new TellCommand(this));
@@ -38,5 +42,9 @@ public class Survival extends JavaPlugin {
 	@NotNull
 	public PluginConfig getPluginConfig() {
 		return config;
+	}
+
+	public static Survival getInstance() {
+		return instance;
 	}
 }

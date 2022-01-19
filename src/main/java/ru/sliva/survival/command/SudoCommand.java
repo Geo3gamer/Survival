@@ -1,32 +1,24 @@
 package ru.sliva.survival.command;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.sliva.api.TextUtil;
 import ru.sliva.api.Translatable;
 import ru.sliva.api.Utils;
 import ru.sliva.api.command.AbstractCommand;
 import ru.sliva.api.legacy.Audiences;
 import ru.sliva.survival.Survival;
-import ru.sliva.survival.config.PluginConfig;
+import ru.sliva.survival.config.Cmds;
 
 import java.util.List;
 
-public class SudoCommand extends AbstractCommand {
-
-    private final PluginConfig config;
-
-    private final LegacyComponentSerializer configSerializer = TextUtil.configSerializer;
+public final class SudoCommand extends AbstractCommand {
 
     public SudoCommand(@NotNull Survival plugin) {
         super(plugin, "sudo", "Выполнить команду от имени игрока", "/sudo <игрок> </команда>", "survival.sudo");
-        this.config = plugin.getPluginConfig();
     }
 
     @Override
@@ -39,9 +31,7 @@ public class SudoCommand extends AbstractCommand {
             }
             String command = Utils.stringFromArray(args, 1, " ");
 
-            Component executed = configSerializer.deserialize(TextUtil.fromNullable(config.getCommand("sudo").node("executed").getString()));
-            executed = executed.replaceText(builder -> builder.matchLiteral("{player}").replacement(TextUtil.getDisplayName(player)));
-            executed = executed.replaceText(builder -> builder.matchLiteral("{command}").replacement(Component.text(command).color(NamedTextColor.GRAY)));
+            Component executed = Cmds.sudo_executed.defineTarget(player).defineCommand(command).getComponent();
 
             player.chat(command);
 

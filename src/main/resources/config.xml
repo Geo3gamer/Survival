@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
     <messages>
-        <join>{target} %aприсоединился к игре.</join>
-        <quit>{target} %cпокинул игру.</quit>
+        <join>{player} %aприсоединился к игре.</join>
+        <quit>{player} %cпокинул игру.</quit>
         <motd>%c%l| Test</motd>
         <listPlayers>%e%l{min}%8/%e%l{max}</listPlayers>
         <chatFormat>{player}%8 » {message}</chatFormat>
@@ -20,17 +20,17 @@
 
     <commands>
         <tell>
-            <fromSender>%2[%r{s} %a-> %r{t}%2]%8 » {msg}</fromSender>
-            <onTarget>%3[%r{t} %b&lt;- %r{s}%3]%8 » {msg}</onTarget>
+            <fromSender>%2[%r{sender} %a-> %r{target}%2]%8 » {message}</fromSender>
+            <onTarget>%3[%r{target} %b&lt;- %r{sender}%3]%8 » {message}</onTarget>
         </tell>
         <slezhka>
             <enabled>%aСлежка включена.</enabled>
             <disabled>%cСлежка выключена.</disabled>
-            <kick>%c[Kick] (%r{player}%c) %8» %r{message}</kick>
-            <command>%a[Command] (%r{player}%a) %8» %f{command}</command>
+            <kick>%c[Kick] (%r{target}%c) %8» %r{message}</kick>
+            <command>%a[Command] (%r{target}%a) %8» %f{command}</command>
         </slezhka>
         <sudo>
-            <executed>%a[%r{player}%a]%8 » {command}</executed>
+            <executed>%a[%r{target}%a]%8 » {command}</executed>
         </sudo>
     </commands>
 </root>
