@@ -53,7 +53,7 @@ public final class TellCommand extends AbstractCommand {
 
             Component fromSender = Cmds.tell_fromSender.defineSender(sender).defineTarget(player).defineMessage(finalMessage).getComponent();
 
-            Component onTarget = Cmds.tell_toTarget.defineSender(sender).defineTarget(player).defineMessage(finalMessage).getComponent();
+            Component onTarget = Cmds.tell_onTarget.defineSender(sender).defineTarget(player).defineMessage(finalMessage).getComponent();
             onTarget = onTarget.hoverEvent(HoverEvent.showText(HoverEvents.reply.getComponent()));
             onTarget = onTarget.clickEvent(ClickEvent.suggestCommand("/tell " + sender.getName()));
 

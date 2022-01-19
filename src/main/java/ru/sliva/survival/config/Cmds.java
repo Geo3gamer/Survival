@@ -9,7 +9,7 @@ import ru.sliva.survival.Survival;
 public enum Cmds {
 
     tell_fromSender("tell", "fromSender"),
-    tell_toTarget("tell", "toTarget"),
+    tell_onTarget("tell", "onTarget"),
     slezhka_enabled("slezhka", "enabled"),
     slezhka_disabled("slezhka", "disabled"),
     slezhka_kick("slezhka", "kick"),
