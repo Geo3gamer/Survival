@@ -62,7 +62,7 @@ public class TellCommand extends AbstractCommand {
             fromSender = fromSender.replaceText(builder -> builder.matchLiteral("{msg}").replacement(finalMessage));
 
             Component onTarget = configSerializer.deserialize(TextUtil.fromNullable(command.node("onTarget").getString()));
-            onTarget = onTarget.hoverEvent(HoverEvent.showText(ampersandSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("reply").getString()))));
+            onTarget = onTarget.hoverEvent(HoverEvent.showText(configSerializer.deserialize(TextUtil.fromNullable(hoverEvents.node("reply").getString()))));
             onTarget = onTarget.clickEvent(ClickEvent.suggestCommand("/tell " + sender.getName()));
             onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{s}").replacement(TextUtil.getDisplayName(sender).color(NamedTextColor.WHITE)));
             onTarget = onTarget.replaceText(builder -> builder.matchLiteral("{t}").replacement(p.displayName().color(NamedTextColor.WHITE)));
