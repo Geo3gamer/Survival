@@ -15,7 +15,7 @@ public class Sidebar implements Runnable {
 
     private final List<String[]> informationList = new ArrayList<>(Arrays.asList(
             new String[] {
-                    "§6| §fIP: §eartgamesurv.joinserver.ru",
+                    "§6| §fIP: §esurv.artgame.tk",
                     "§6| §fВанильное выживание без",
                     "§6| §fкоманд и телепортаций"
             },

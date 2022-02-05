@@ -50,29 +50,33 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onJoin(@NotNull PlayerJoinEvent e) {
-        e.joinMessage(null);
-        Player p = e.getPlayer();
-        Component join = configSerializer.deserialize(TextUtil.fromNullable(messages.node("join").getString()));
-        join = join.replaceText(builder -> builder.matchLiteral("{target}").replacement(p.displayName()));
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.sendActionBar(join);
+        if(e.joinMessage() != null) {
+            e.joinMessage(null);
+            Player p = e.getPlayer();
+            Component join = configSerializer.deserialize(TextUtil.fromNullable(messages.node("join").getString()));
+            join = join.replaceText(builder -> builder.matchLiteral("{target}").replacement(p.displayName()));
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendActionBar(join);
+            }
+            Bukkit.getConsoleSender().sendMessage(join);
         }
-        Bukkit.getConsoleSender().sendMessage(join);
     }
 
     @EventHandler
     public void onQuit(@NotNull PlayerQuitEvent e) {
-        e.quitMessage(null);
-        Player p = e.getPlayer();
-        Component quit = configSerializer.deserialize(TextUtil.fromNullable(messages.node("quit").getString()));
-        quit = quit.replaceText(builder -> builder.match("{target}").replacement(p.displayName()));
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.sendActionBar(quit);
+        if(e.quitMessage() != null) {
+            e.quitMessage(null);
+            Player p = e.getPlayer();
+            Component quit = configSerializer.deserialize(TextUtil.fromNullable(messages.node("quit").getString()));
+            quit = quit.replaceText(builder -> builder.match("{target}").replacement(p.displayName()));
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendActionBar(quit);
+            }
+            Bukkit.getConsoleSender().sendMessage(quit);
         }
-        Bukkit.getConsoleSender().sendMessage(quit);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPing(@NotNull PaperServerListPingEvent event) {
         event.motd(configSerializer.deserialize(TextUtil.fromNullable(messages.node("motd").getString())));
         event.setMaxPlayers(event.getNumPlayers() + 1);
